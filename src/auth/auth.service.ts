@@ -1,11 +1,18 @@
 import { ForbiddenException, Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { AuthDto } from "./dto";
+import { JwtService } from "@nestjs/jwt";
+import { UserRole } from "@prisma/client";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService) {}
-  async signup(dto: AuthDto) {
+  constructor(
+    private prisma: PrismaService,
+    private jwt: JwtService,
+    private configService: ConfigService,
+  ) {}
+  async signup(dto: AuthDto, role: UserRole) {
     const isUserExist = await this.prisma.user.findUnique({
       where: {
         email: dto.email,
@@ -18,14 +25,11 @@ export class AuthService {
       data: {
         email: dto.email,
         password: dto.password,
-      },
-      select: {
-        id: true,
-        email: true,
+        role,
       },
     });
 
-    return user;
+    return this.signToken(user.id, user.email, user.role);
   }
 
   async signin(dto: AuthDto) {
@@ -46,6 +50,20 @@ export class AuthService {
 
     delete user.password;
 
-    return user;
+    return this.signToken(user.id, user.email, user.role);
+  }
+
+  async signToken(userId: string, email: string, userRole: UserRole) {
+    const payload = {
+      sub: userId,
+      email,
+      role: userRole,
+    };
+
+    const secret = this.configService.get<string>("jwt_secret");
+    return this.jwt.signAsync(payload, {
+      expiresIn: "1d",
+      secret: secret,
+    });
   }
 }
