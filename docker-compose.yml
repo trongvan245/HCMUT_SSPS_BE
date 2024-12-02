@@ -1,0 +1,14 @@
+services:
+  dev-db:
+    image: postgres:15 # Updated version
+    ports:
+      - 5434:5433
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: trongvan
+      POSTGRES_DB: ssps
+
+    networks:
+      - ssps
+networks:
+  ssps:
