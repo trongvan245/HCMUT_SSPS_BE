@@ -8,7 +8,7 @@ import { addPrinterDto, updatePrinterDto } from "./dto";
 @ApiBearerAuth()
 @ApiTags("admin")
 @Controller("admin")
-// @ADD_ADMIN()
+@ADD_ADMIN()
 export class AdminController {
   constructor(private adminService: AdminService) {}
 
