@@ -7,8 +7,9 @@ import { diskStorage } from "multer";
 import { v4 as uuidv4 } from "uuid";
 import { extname } from "path";
 import { addPrinterDto } from "./dto/print.dto";
-import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 
+@ApiBearerAuth()
 @ApiTags("Print")
 @Controller("print")
 export class PrintController {

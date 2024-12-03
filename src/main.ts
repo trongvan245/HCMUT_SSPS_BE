@@ -9,14 +9,20 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: false }));
 
   const config = new DocumentBuilder()
-    .setTitle("Cats example")
-    .setDescription("The cats API description")
+    .setTitle("SSPS")
+    .setDescription("SSPS API description")
     .setVersion("1.0")
-    .addTag("authenticate")
     .addBearerAuth()
+    .addTag("authenticate")
+    .addTag("Users")
+    .addTag("print")
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup("api", app, document); //https://github.com/nestjs/swagger/issues/92 add trailing slash to the end of the url
+  SwaggerModule.setup("api", app, document, {
+    swaggerOptions: {
+      persistAuthorization: true, // Optional: Keeps the token after refreshing the page
+    },
+  }); //https://github.com/nestjs/swagger/issues/92 add trailing slash to the end of the url
 
   const allowedOrigins = [
     "http://localhost:5173", // Frontend service 1 (development)
