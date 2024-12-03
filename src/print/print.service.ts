@@ -5,21 +5,26 @@ import { addPrinterDto } from "./dto/print.dto";
 
 @Injectable()
 export class PrintService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(private prisma: PrismaService) {}
 
   async checkPrinterExist(location: string) {
-    return await this.prismaService.printer.findFirst({ where: { location } });
+    const res = await this.prisma.printer.findFirst({ where: { building: location } });
+    return res;
   }
 
   async addPrinter({ location }: addPrinterDto) {
     if (await this.checkPrinterExist(location)) throw new ForbiddenException("Printer already exist");
-    return this.prismaService.printer.create({
-      data: { location },
+    return this.prisma.printer.create({
+      data: { building: location },
     });
   }
 
+  async getPrinters() {
+    return this.prisma.printer.findMany();
+  }
+
   async createRecord(user: JwtPayLoad, filename: string, location: string) {
-    return this.prismaService.printingRecord.create({
+    return this.prisma.printingRecord.create({
       data: {
         url: filename,
         user: {
@@ -29,7 +34,7 @@ export class PrintService {
         },
         printer: {
           connect: {
-            location,
+            building: location,
           },
         },
       },
@@ -37,17 +42,21 @@ export class PrintService {
   }
 
   async getHistory() {
-    const history = await this.prismaService.printingRecord.findMany();
+    const history = await this.prisma.printingRecord.findMany();
     return history;
   }
   async getHistoryFromPrinter(location: string) {
     if (!(await this.checkPrinterExist(location))) throw new ForbiddenException("Printer not found");
 
-    return this.prismaService.printingRecord.findMany({
+    return this.prisma.printingRecord.findMany({
       where: {
         printer: {
-          location,
+          building: "H1",
         },
+      },
+      include: {
+        printer: true,
+        user: true,
       },
     });
   }

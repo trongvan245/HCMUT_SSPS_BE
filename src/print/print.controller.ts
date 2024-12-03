@@ -7,10 +7,10 @@ import { diskStorage } from "multer";
 import { v4 as uuidv4 } from "uuid";
 import { extname } from "path";
 import { addPrinterDto } from "./dto/print.dto";
-import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 
 @ApiBearerAuth()
-@ApiTags("Print")
+@ApiTags("print")
 @Controller("print")
 export class PrintController {
   constructor(private printService: PrintService) {}
@@ -23,7 +23,30 @@ export class PrintController {
     return { message: "Create success", res };
   }
 
+  @ApiOperation({ summary: "Get all printers" })
+  @Get("getprinters")
+  async getPrinters() {
+    const printers = await this.printService.getPrinters();
+    return { message: "Success", printers };
+  }
+
   @ApiOperation({ summary: "Upload file" })
+  @ApiConsumes("multipart/form-data")
+  @ApiBody({
+    description: "File upload",
+    schema: {
+      type: "object",
+      properties: {
+        file: {
+          type: "string",
+          format: "binary", // Indicates a file input
+        },
+        data: {
+          type: "string", // Example of additional form data
+        },
+      },
+    },
+  })
   @Post("upload")
   @UseInterceptors(
     FileInterceptor("file", {
@@ -58,14 +81,20 @@ export class PrintController {
     return { message: "File uploaded successfully", file: file.filename, location };
   }
 
-  @ApiOperation({ summary: "Get history" })
+  @ApiOperation({ summary: "ADMIN ONLY. Get history" })
   @Get("history")
   async getHistory(@GetUser() user: JwtPayLoad) {
     const history = await this.printService.getHistory();
     return { message: "Success", history };
   }
 
-  @ApiOperation({ summary: "Get history from printer" })
+  @ApiOperation({ summary: "ADMIN ONLY. Get history from printer" })
+  @ApiParam({
+    name: "location",
+    description: "The location of the printer to fetch history for",
+    required: true,
+    type: String, // Specify the type of the parameter
+  })
   @Get("history/:location")
   async getHistoryFromPrinter(@GetUser() user: JwtPayLoad, @Param() { location }: { location: string }) {
     const history = await this.printService.getHistoryFromPrinter(location);
