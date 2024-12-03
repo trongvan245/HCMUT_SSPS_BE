@@ -6,7 +6,6 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
 import { v4 as uuidv4 } from "uuid";
 import { extname } from "path";
-import { addPrinterDto } from "./dto/print.dto";
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 
 @ApiBearerAuth()
@@ -14,14 +13,6 @@ import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiTags } 
 @Controller("print")
 export class PrintController {
   constructor(private printService: PrintService) {}
-
-  @ApiOperation({ summary: "Add printer" })
-  @Post("addprinter")
-  @ADD_ADMIN()
-  async addPrinter(@Body() { location }: addPrinterDto) {
-    const res = await this.printService.addPrinter({ location });
-    return { message: "Create success", res };
-  }
 
   @ApiOperation({ summary: "Get all printers" })
   @Get("getprinters")
@@ -41,8 +32,14 @@ export class PrintController {
           type: "string",
           format: "binary", // Indicates a file input
         },
-        data: {
+        location: {
           type: "string", // Example of additional form data
+        },
+        copies: {
+          type: "number", // Example of additional form data
+        },
+        pages: {
+          type: "number", // Example of additional form data
         },
       },
     },
@@ -70,34 +67,22 @@ export class PrintController {
   async uploadFile(
     @GetUser() user: JwtPayLoad,
     @UploadedFile() file: Express.Multer.File,
-    @Body("data") location: string,
+    @Body("location") location: string,
+    @Body("copies") copies: number,
+    @Body("pages") pages: number,
   ) {
     if (!file) throw new NotFoundException("No file uploaded or file is not image");
     if (!location) throw new NotFoundException("Location is required");
     if (!(await this.printService.checkPrinterExist(location))) throw new NotFoundException("Printer not found");
+    const record = await this.printService.createRecord(
+      user,
+      file.originalname,
+      file.filename,
+      location,
+      pages as number,
+      copies as number,
+    );
 
-    const record = await this.printService.createRecord(user, file.filename, location);
-
-    return { message: "File uploaded successfully", file: file.filename, location };
-  }
-
-  @ApiOperation({ summary: "ADMIN ONLY. Get history" })
-  @Get("history")
-  async getHistory(@GetUser() user: JwtPayLoad) {
-    const history = await this.printService.getHistory();
-    return { message: "Success", history };
-  }
-
-  @ApiOperation({ summary: "ADMIN ONLY. Get history from printer" })
-  @ApiParam({
-    name: "location",
-    description: "The location of the printer to fetch history for",
-    required: true,
-    type: String, // Specify the type of the parameter
-  })
-  @Get("history/:location")
-  async getHistoryFromPrinter(@GetUser() user: JwtPayLoad, @Param() { location }: { location: string }) {
-    const history = await this.printService.getHistoryFromPrinter(location);
-    return { message: "Success", history };
+    return { message: "File uploaded successfully", record };
   }
 }

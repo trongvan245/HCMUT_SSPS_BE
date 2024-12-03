@@ -1,7 +1,6 @@
 import { ForbiddenException, Injectable } from "@nestjs/common";
 import { JwtPayLoad } from "src/common/model";
 import { PrismaService } from "src/prisma/prisma.service";
-import { addPrinterDto } from "./dto/print.dto";
 
 @Injectable()
 export class PrintService {
@@ -12,21 +11,15 @@ export class PrintService {
     return res;
   }
 
-  async addPrinter({ location }: addPrinterDto) {
-    if (await this.checkPrinterExist(location)) throw new ForbiddenException("Printer already exist");
-    return this.prisma.printer.create({
-      data: { building: location },
-    });
-  }
-
   async getPrinters() {
     return this.prisma.printer.findMany();
   }
 
-  async createRecord(user: JwtPayLoad, filename: string, location: string) {
+  async createRecord(user: JwtPayLoad, fileName: string, url: string, location: string, pages: number, copies: number) {
     return this.prisma.printingRecord.create({
       data: {
-        url: filename,
+        fileName,
+        url,
         user: {
           connect: {
             id: user.sub,
@@ -37,26 +30,8 @@ export class PrintService {
             building: location,
           },
         },
-      },
-    });
-  }
-
-  async getHistory() {
-    const history = await this.prisma.printingRecord.findMany();
-    return history;
-  }
-  async getHistoryFromPrinter(location: string) {
-    if (!(await this.checkPrinterExist(location))) throw new ForbiddenException("Printer not found");
-
-    return this.prisma.printingRecord.findMany({
-      where: {
-        printer: {
-          building: "H1",
-        },
-      },
-      include: {
-        printer: true,
-        user: true,
+        pages: Number(pages),
+        copies: Number(copies),
       },
     });
   }

@@ -17,6 +17,10 @@ enum UserRole {
   ADMIN
   STUDENT
 }
+enum PrinterStatus {
+  AVAILABLE
+  NOT_AVAILABLE
+}
 
 model User {
   id        String   @id @default(uuid())
@@ -33,7 +37,10 @@ model User {
 
 model Printer {
   id        String   @id @default(uuid())
+  name      String   @default("Printer")
+  status    PrinterStatus  @default(AVAILABLE)
   building  String   @unique
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -42,9 +49,12 @@ model Printer {
   @@map("printers")
 }
 
-model PrintingRecord {
+model PrintingRecord {npx 
   id  String @id @default(uuid())
   url String
+  fileName String
+  copies Int
+  pages Int
 
   userId String
   user   User   @relation(fields: [userId], references: [id])

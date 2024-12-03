@@ -7,10 +7,10 @@ import { APP_GUARD } from "@nestjs/core";
 import { JwtGuard } from "./common/guards";
 import { RoleGuard } from "./common/guards/role.guard";
 import { UserModule } from "./user/user.module";
-import { StudentModule } from "./student/student.module";
 import { PrintModule } from "./print/print.module";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
+import { AdminModule } from "./admin/admin.module";
 
 @Module({
   imports: [
@@ -22,8 +22,8 @@ import { join } from "path";
     AuthModule,
     PrismaModule,
     UserModule,
-    StudentModule,
     PrintModule,
+    AdminModule,
   ],
   controllers: [],
   providers: [
