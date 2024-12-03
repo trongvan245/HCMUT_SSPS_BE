@@ -6,6 +6,14 @@ import { PrismaService } from "src/prisma/prisma.service";
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
+  async getMe(user: JwtPayLoad) {
+    return this.prisma.user.findUnique({
+      where: {
+        id: user.sub,
+      },
+    });
+  }
+
   async getHistory(user: JwtPayLoad) {
     return this.prisma.printingRecord.findMany({
       where: {

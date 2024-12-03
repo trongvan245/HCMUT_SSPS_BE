@@ -12,8 +12,10 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Get("me")
-  getMe(@GetUser() user: JwtPayLoad) {
-    return { msg: "Get me", user };
+  async getMe(@GetUser() user: JwtPayLoad) {
+    const res = await this.userService.getMe(user);
+    delete res.password;
+    return { msg: "Get me", user: res };
   }
 
   @Get("student")
