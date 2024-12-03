@@ -52,7 +52,7 @@ export class PrintController {
     FileInterceptor("file", {
       limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
       fileFilter: (req, file, callback) => {
-        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
+        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|pdf)$/)) {
           return callback(null, false);
         }
         callback(null, true);
