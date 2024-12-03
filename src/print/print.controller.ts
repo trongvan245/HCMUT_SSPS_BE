@@ -32,7 +32,7 @@ export class PrintController {
           type: "string",
           format: "binary", // Indicates a file input
         },
-        location: {
+        id: {
           type: "string", // Example of additional form data
         },
         copies: {
@@ -67,18 +67,18 @@ export class PrintController {
   async uploadFile(
     @GetUser() user: JwtPayLoad,
     @UploadedFile() file: Express.Multer.File,
-    @Body("location") location: string,
+    @Body("id") id: string,
     @Body("copies") copies: number,
     @Body("pages") pages: number,
   ) {
     if (!file) throw new NotFoundException("No file uploaded or file is not image");
-    if (!location) throw new NotFoundException("Location is required");
-    if (!(await this.printService.checkPrinterExist(location))) throw new NotFoundException("Printer not found");
+    if (!id) throw new NotFoundException("ID is required");
+    if (!(await this.printService.checkPrinterExist(id))) throw new NotFoundException("Printer not found");
     const record = await this.printService.createRecord(
       user,
       file.originalname,
       file.filename,
-      location,
+      id,
       pages as number,
       copies as number,
     );

@@ -1,13 +1,13 @@
 import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
-import { addPrinterDto } from "./dto";
+import { addPrinterDto, updatePrinterDto } from "./dto";
 
 @Injectable()
 export class AdminService {
   constructor(private prisma: PrismaService) {}
 
-  async checkPrinterExist(location: string) {
-    const res = await this.prisma.printer.findFirst({ where: { building: location } });
+  async checkPrinterExist(id: string) {
+    const res = await this.prisma.printer.findFirst({ where: { id } });
     return res;
   }
 
@@ -16,13 +16,13 @@ export class AdminService {
     return history;
   }
 
-  async getHistoryFromPrinter(location: string) {
-    if (!(await this.checkPrinterExist(location))) throw new ForbiddenException("Printer not found");
+  async getHistoryFromPrinter(id: string) {
+    if (!(await this.checkPrinterExist(id))) throw new ForbiddenException("Printer not found");
 
     return this.prisma.printingRecord.findMany({
       where: {
         printer: {
-          building: location,
+          id,
         },
       },
       include: {
@@ -32,18 +32,17 @@ export class AdminService {
     });
   }
 
-  async addPrinter({ name, location, status }: addPrinterDto) {
-    if (await this.checkPrinterExist(location)) throw new NotFoundException("Printer already exist");
+  async addPrinter({ name, building, campsite, status }: addPrinterDto) {
     return this.prisma.printer.create({
-      data: { name, status, building: location },
+      data: { name, status, building, campsite },
     });
   }
 
-  async updatePrinter({ name, location, status }: addPrinterDto) {
-    if (!(await this.checkPrinterExist(location))) throw new NotFoundException("Printer not found");
+  async updatePrinter({ id, name, building, campsite, status }: updatePrinterDto) {
+    if (!(await this.checkPrinterExist(id))) throw new NotFoundException("Printer not found");
     return this.prisma.printer.update({
-      where: { building: location },
-      data: { name, status },
+      where: { id },
+      data: { name, status, building, campsite },
     });
   }
 }

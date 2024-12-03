@@ -20,29 +20,24 @@ export class AdminController {
   }
 
   @ApiOperation({ summary: "ADMIN ONLY. Get history from printer" })
-  @ApiParam({
-    name: "location",
-    description: "The location of the printer to fetch history for",
-    required: true,
-    type: String, // Specify the type of the parameter
-  })
-  @Get("history/:location")
-  async getHistoryFromPrinter(@GetUser() user: JwtPayLoad, @Param() { location }: { location: string }) {
-    const history = await this.adminService.getHistoryFromPrinter(location);
+  @Get("history/:id")
+  async getHistoryFromPrinter(@GetUser() user: JwtPayLoad, @Param("id") id: string) {
+    console.log(id);
+    const history = await this.adminService.getHistoryFromPrinter(id);
     return { message: "Success", history };
   }
 
   @ApiOperation({ summary: "Add printer" })
   @Post("addprinter")
-  async addPrinter(@Body() { name, location, status }: addPrinterDto) {
-    const res = await this.adminService.addPrinter({ name, location, status });
+  async addPrinter(@Body() { name, building, campsite, status }: addPrinterDto) {
+    const res = await this.adminService.addPrinter({ name, building, campsite, status });
     return { message: "Create success", res };
   }
 
   @ApiOperation({ summary: "Update printer" })
   @Patch("updateprinter")
-  async updatePrinter(@Body() { name, location, status }: updatePrinterDto) {
-    const res = await this.adminService.updatePrinter({ name, location, status });
+  async updatePrinter(@Body() { id, name, building, campsite, status }: updatePrinterDto) {
+    const res = await this.adminService.updatePrinter({ id, name, building, campsite, status });
     return { message: "Update success", res };
   }
 }

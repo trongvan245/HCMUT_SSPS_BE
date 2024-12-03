@@ -6,8 +6,8 @@ import { PrismaService } from "src/prisma/prisma.service";
 export class PrintService {
   constructor(private prisma: PrismaService) {}
 
-  async checkPrinterExist(location: string) {
-    const res = await this.prisma.printer.findFirst({ where: { building: location } });
+  async checkPrinterExist(id: string) {
+    const res = await this.prisma.printer.findFirst({ where: { id } });
     return res;
   }
 
@@ -15,7 +15,7 @@ export class PrintService {
     return this.prisma.printer.findMany();
   }
 
-  async createRecord(user: JwtPayLoad, fileName: string, url: string, location: string, pages: number, copies: number) {
+  async createRecord(user: JwtPayLoad, fileName: string, url: string, id: string, pages: number, copies: number) {
     return this.prisma.printingRecord.create({
       data: {
         fileName,
@@ -27,7 +27,7 @@ export class PrintService {
         },
         printer: {
           connect: {
-            building: location,
+            id,
           },
         },
         pages: Number(pages),
