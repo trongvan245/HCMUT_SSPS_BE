@@ -17,17 +17,18 @@ enum UserRole {
   ADMIN
   STUDENT
 }
+
 enum PrinterStatus {
   AVAILABLE
   NOT_AVAILABLE
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
+  id       String @id @default(uuid())
+  email    String @unique
+  password String
 
-  name      String   @default("Anonymous")
+  name String @default("Anonymous")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -39,11 +40,11 @@ model User {
 }
 
 model Printer {
-  id        String   @id @default(uuid())
-  name      String   
-  status    PrinterStatus  @default(AVAILABLE)
-  building  String   @default("B1")
-  campsite  String   @default("Campsite 1")
+  id       String        @id @default(uuid())
+  name     String
+  status   PrinterStatus @default(AVAILABLE)
+  building String        @default("B1")
+  campsite String        @default("Campsite 1")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -54,12 +55,13 @@ model Printer {
 }
 
 model PrintingRecord {
-  id  String @id @default(uuid())
-  url String
+  id       String @id @default(uuid())
+  url      String
   fileName String
-  copies Int
-  pages Int
-  
+  filesize Int  @default(1024)
+  copies   Int    
+  pages    Int
+
   userId String
   user   User   @relation(fields: [userId], references: [id])
 
@@ -67,7 +69,7 @@ model PrintingRecord {
   printer   Printer @relation(fields: [printerId], references: [id])
 
   createAt DateTime @default(now())
-  updateAt DateTime @updatedAt @default(now())
+  updateAt DateTime @default(now()) @updatedAt
 
   @@map("printing_records")
 }

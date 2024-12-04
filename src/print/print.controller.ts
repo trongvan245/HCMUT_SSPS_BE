@@ -79,6 +79,7 @@ export class PrintController {
       file.originalname,
       file.filename,
       id,
+      file.size,
       pages as number,
       copies as number,
     );

@@ -15,7 +15,15 @@ export class PrintService {
     return this.prisma.printer.findMany();
   }
 
-  async createRecord(user: JwtPayLoad, fileName: string, url: string, id: string, pages: number, copies: number) {
+  async createRecord(
+    user: JwtPayLoad,
+    fileName: string,
+    url: string,
+    id: string,
+    size: number,
+    pages: number,
+    copies: number,
+  ) {
     return this.prisma.printingRecord.create({
       data: {
         fileName,
@@ -30,6 +38,7 @@ export class PrintService {
             id,
           },
         },
+        filesize: Number(size),
         pages: Number(pages),
         copies: Number(copies),
       },
