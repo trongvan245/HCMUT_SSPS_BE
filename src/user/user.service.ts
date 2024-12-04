@@ -15,12 +15,30 @@ export class UserService {
   }
 
   async getHistory(user: JwtPayLoad) {
-    return this.prisma.printingRecord.findMany({
+    const records = await this.prisma.printingRecord.findMany({
       where: {
         user: {
           id: user.sub,
         },
       },
+      select: {
+        id: true,
+        fileName: true,
+        url: true,
+        pages: true,
+        copies: true,
+        printer: {
+          select: {
+            name: true,
+          },
+        },
+        createAt: true,
+      },
     });
+
+    return records.map((record) => ({
+      ...record,
+      printer: record.printer.name,
+    }));
   }
 }

@@ -66,5 +66,8 @@ model PrintingRecord {
   printerId String
   printer   Printer @relation(fields: [printerId], references: [id])
 
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt @default(now())
+
   @@map("printing_records")
 }

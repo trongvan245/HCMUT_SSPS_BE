@@ -12,14 +12,24 @@ export class AdminService {
   }
 
   async getHistory() {
-    const history = await this.prisma.printingRecord.findMany();
-    return history;
+    const records = await this.prisma.printingRecord.findMany({
+      include: {
+        printer: true,
+        user: true,
+      },
+    });
+
+    return records.map((record) => ({
+      ...record,
+      printer: record.printer.name,
+      user: record.user.name,
+    }));
   }
 
   async getHistoryFromPrinter(id: string) {
     if (!(await this.checkPrinterExist(id))) throw new ForbiddenException("Printer not found");
 
-    return this.prisma.printingRecord.findMany({
+    const records = await this.prisma.printingRecord.findMany({
       where: {
         printer: {
           id,
@@ -30,6 +40,12 @@ export class AdminService {
         user: true,
       },
     });
+
+    return records.map((record) => ({
+      ...record,
+      printer: record.printer.name,
+      user: record.user.name,
+    }));
   }
 
   async addPrinter({ name, building, campsite, status }: addPrinterDto) {
