@@ -47,4 +47,11 @@ export class AdminController {
     const res = await this.adminService.deletePrinter(id);
     return { message: "Delete success", res };
   }
+
+  @ApiOperation({ summary: "Get student history" })
+  @Get("studenthistory/:id")
+  async getStudentHistory(@Param("id") id: string) {
+    const res = await this.adminService.getStudentHistory(id);
+    return { message: "Get success", res };
+  }
 }

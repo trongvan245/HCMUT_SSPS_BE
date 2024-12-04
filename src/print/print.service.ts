@@ -24,6 +24,9 @@ export class PrintService {
     pages: number,
     copies: number,
   ) {
+    const printer = await this.prisma.printer.findFirst({ where: { id } });
+    if (printer.status === "NOT_AVAILABLE") throw new ForbiddenException("Printer is not available");
+
     return this.prisma.printingRecord.create({
       data: {
         fileName,

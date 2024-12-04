@@ -1,6 +1,8 @@
 import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { addPrinterDto, updatePrinterDto } from "./dto";
+import { GetUser } from "src/common/decorators";
+import { JwtPayLoad } from "src/common/model";
 
 @Injectable()
 export class AdminService {
@@ -65,5 +67,33 @@ export class AdminService {
   async deletePrinter(id: string) {
     if (!(await this.checkPrinterExist(id))) throw new NotFoundException("Printer not found");
     return this.prisma.printer.delete({ where: { id } });
+  }
+
+  async getStudentHistory(id: string) {
+    const user = await this.prisma.user.findFirst({ where: { id } });
+    if (!user) throw new NotFoundException("User not found");
+    const records = await this.prisma.printingRecord.findMany({
+      where: { userId: id },
+      select: {
+        id: true,
+        fileName: true,
+        url: true,
+        pages: true,
+        copies: true,
+        printer: {
+          select: {
+            name: true,
+          },
+        },
+        createAt: true,
+        filesize: true,
+      },
+    });
+
+    return records.map((record) => ({
+      ...record,
+      printer: record.printer.name,
+    }));
+    // return this.prisma.printingRecord.delete({ where: { userId: id } });//fixx me
   }
 }
