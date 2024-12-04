@@ -50,7 +50,7 @@ export class AuthService {
 
     delete user.password;
 
-    return this.signToken(user.id, user.email, user.role);
+    return { token: await this.signToken(user.id, user.email, user.role), userRole: user.role };
   }
 
   async signToken(userId: string, email: string, userRole: UserRole) {

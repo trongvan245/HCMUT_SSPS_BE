@@ -36,7 +36,7 @@ export class AuthController {
   @Post("signin")
   async signin(@Body() dto: AuthDto) {
     const token = await this.authService.signin(dto);
-    return { msg: "Success", token };
+    return { msg: "Success", ...token };
     // return await this.authService.signin(body);
   }
 }
