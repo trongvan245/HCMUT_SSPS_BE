@@ -18,6 +18,8 @@ export class RoleGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
     const user: JwtPayLoad = request.user;
+    console.log(user);
+    console.log(request.headers["authorization"]);
     if (user.role == "STUDENT" && isAdminRoute) {
       throw new ForbiddenException(GENERAL_MESSAGE.STUDENT_NOT_ALLOWED);
     }
