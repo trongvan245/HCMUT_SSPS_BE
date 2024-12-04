@@ -61,4 +61,9 @@ export class AdminService {
       data: { name, status, building, campsite },
     });
   }
+
+  async deletePrinter(id: string) {
+    if (!(await this.checkPrinterExist(id))) throw new NotFoundException("Printer not found");
+    return this.prisma.printer.delete({ where: { id } });
+  }
 }

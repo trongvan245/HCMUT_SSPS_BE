@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 import { ADD_ADMIN, GetUser } from "src/common/decorators";
 import { JwtPayLoad } from "src/common/model";
@@ -39,5 +39,12 @@ export class AdminController {
   async updatePrinter(@Body() { id, name, building, campsite, status }: updatePrinterDto) {
     const res = await this.adminService.updatePrinter({ id, name, building, campsite, status });
     return { message: "Update success", res };
+  }
+
+  @ApiOperation({ summary: "Delete printer" })
+  @Delete("deleteprinter/:id")
+  async deletePrinter(@Param("id") id: string) {
+    const res = await this.adminService.deletePrinter(id);
+    return { message: "Delete success", res };
   }
 }
