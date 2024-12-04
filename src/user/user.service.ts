@@ -33,6 +33,7 @@ export class UserService {
           },
         },
         createAt: true,
+        filesize: true,
       },
     });
 
