@@ -1,3 +1,9 @@
+<div align="center">
+<a href="https://github.com/phuongngo0320/hcmut-ssps">
+    <img src="https://hcmut.edu.vn/img/nhanDienThuongHieu/01_logobachkhoatoi.png" alt="Logo">
+  </a>
+</div>
+  
 # Assignment HCMUT Smart Student Printing Service
 
 ## About
