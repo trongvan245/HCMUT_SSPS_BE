@@ -36,6 +36,9 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  totalPages Int @default(0)//new field: get from sum printingrecord.pages
+  remainPages Int @default(100)
+
   role           UserRole         @default(STUDENT)
   printingRecord PrintingRecord[]
 
@@ -52,6 +55,8 @@ model Printer {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  totalPages Int @default(0)//new field: get from sum printingrecord.pages
+  remainPages Int @default(100)
   printingRecord PrintingRecord[]
 
   @@map("printers")

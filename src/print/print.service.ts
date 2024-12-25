@@ -15,6 +15,38 @@ export class PrintService {
     return this.prisma.printer.findMany();
   }
 
+  async updateUserTotalPages(userId: string) {
+    //very inefficient
+    const result = await this.prisma.printingRecord.aggregate({
+      _sum: {
+        pages: true,
+      },
+      where: {
+        userId: userId,
+      },
+    });
+
+    const user = await this.prisma.user.update({ where: { id: userId }, data: { totalPages: result._sum.pages || 0 } });
+    return user;
+  }
+
+  async updatePrinterTotalPages(printerId: string) {
+    const result = await this.prisma.printingRecord.aggregate({
+      _sum: {
+        pages: true,
+      },
+      where: {
+        printerId: printerId,
+      },
+    });
+
+    const printer = await this.prisma.printer.update({
+      where: { id: printerId },
+      data: { totalPages: result._sum.pages || 0 },
+    });
+    return printer;
+  }
+
   async createRecord(
     user: JwtPayLoad,
     fileName: string,
@@ -27,7 +59,7 @@ export class PrintService {
     const printer = await this.prisma.printer.findFirst({ where: { id } });
     if (printer.status === "NOT_AVAILABLE") throw new ForbiddenException("Printer is not available");
 
-    return this.prisma.printingRecord.create({
+    const res = await this.prisma.printingRecord.create({
       data: {
         fileName,
         url,
@@ -46,5 +78,9 @@ export class PrintService {
         copies: Number(copies),
       },
     });
+
+    const updatedUser = await this.updateUserTotalPages(user.sub);
+    const updatedPrinter = await this.updatePrinterTotalPages(id);
+    return res;
   }
 }
