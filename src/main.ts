@@ -11,7 +11,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle("SSPS")
     .setDescription("SSPS API description")
-    .setVersion("1.0")
+    .setVersion("2.0")
     .addBearerAuth()
     .addTag("authenticate")
     .addTag("Users")
