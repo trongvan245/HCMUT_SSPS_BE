@@ -7,7 +7,23 @@ import { PurchasePagesDto } from "./dto";
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
+  async updateUserTotalPages(userId: string) {
+    //very inefficient
+    const result = await this.prisma.printingRecord.aggregate({
+      _sum: {
+        pages: true,
+      },
+      where: {
+        userId: userId,
+      },
+    });
+
+    const user = await this.prisma.user.update({ where: { id: userId }, data: { totalPages: result._sum.pages || 0 } });
+    return user;
+  }
+
   async getMe(user: JwtPayLoad) {
+    await this.updateUserTotalPages(user.sub);
     return this.prisma.user.findUnique({
       where: {
         id: user.sub,
@@ -50,10 +66,6 @@ export class UserService {
         id: user.sub,
       },
     });
-
-    // if (userRecord. < data.pages) {
-    //   throw new Error("Insufficient balance");
-    // }
 
     const updatedUser = await this.prisma.user.update({
       where: {
