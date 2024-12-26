@@ -4,7 +4,7 @@ import { JwtGuard } from "src/common/guards";
 import { JwtPayLoad } from "src/common/model";
 import { UserService } from "./user.service";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { PurchasePagesDto } from "./dto";
+import { PurchasePagesDto, UpdatePagesDto } from "./dto";
 
 @ApiBearerAuth()
 @ApiTags("Users")
@@ -35,6 +35,13 @@ export class UserController {
   @ADD_ADMIN()
   getAdmin() {
     return { msg: "Get admin" };
+  }
+
+  @ADD_ADMIN()
+  @Post("admin/configpages")
+  async configPages(@Body() { pages }: UpdatePagesDto) {
+    const res = await this.userService.configPages(pages);
+    return { msg: "Config pages", res };
   }
 
   @Get("history")

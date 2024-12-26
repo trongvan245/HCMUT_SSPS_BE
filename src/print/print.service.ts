@@ -79,6 +79,22 @@ export class PrintService {
       },
     });
 
+    await this.prisma.printer.update({
+      where: { id },
+      data: {
+        remainPages: {
+          decrement: pages * copies,
+        },
+      },
+    });
+    await this.prisma.user.update({
+      where: { id: user.sub },
+      data: {
+        remainPages: {
+          decrement: pages * copies,
+        },
+      },
+    });
     const updatedUser = await this.updateUserTotalPages(user.sub);
     const updatedPrinter = await this.updatePrinterTotalPages(id);
     return res;

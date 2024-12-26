@@ -7,3 +7,10 @@ export class PurchasePagesDto {
   @Min(1)
   pages: number;
 }
+
+export class UpdatePagesDto {
+  @ApiProperty({ description: "Change Max Pages to", example: 1000 })
+  @IsInt()
+  @Min(1)
+  pages: number;
+}

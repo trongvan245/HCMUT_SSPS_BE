@@ -38,7 +38,7 @@ model User {
 
   totalPages Int @default(0)//new field: get from sum printingrecord.pages
   remainPages Int @default(100)
-
+  maxPages Int @default(100)
   role           UserRole         @default(STUDENT)
   printingRecord PrintingRecord[]
 

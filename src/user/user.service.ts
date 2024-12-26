@@ -7,6 +7,10 @@ import { PurchasePagesDto } from "./dto";
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
+  async configPages(pages: number) {
+    const res = await this.prisma.user.updateMany({ data: { maxPages: pages } });
+    return res;
+  }
   async updateUserTotalPages(userId: string) {
     //very inefficient
     const result = await this.prisma.printingRecord.aggregate({
