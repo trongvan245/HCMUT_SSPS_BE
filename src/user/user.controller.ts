@@ -49,4 +49,14 @@ export class UserController {
     const history = await this.userService.getHistory(user);
     return { msg: "Get history", history };
   }
+
+  @Get("all")
+  async getAllUsers() {
+    const users = await this.userService.getAllUsers();
+    const filterUser = users.map((user) => {
+      delete user.password;
+      return user;
+    });
+    return { msg: "Get all users", filterUser };
+  }
 }

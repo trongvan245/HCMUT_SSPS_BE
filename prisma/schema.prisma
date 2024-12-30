@@ -81,3 +81,13 @@ model PrintingRecord {
 
   @@map("printing_records")
 }
+
+model AllowedFileType {
+  id    Int    @id @default(autoincrement())
+  types Json
+}
+
+model AllowType {
+  id    Int    @id @default(autoincrement())
+  typeName String @unique 
+}

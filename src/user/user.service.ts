@@ -85,4 +85,8 @@ export class UserService {
     delete updatedUser.password;
     return updatedUser;
   }
+
+  async getAllUsers() {
+    return this.prisma.user.findMany();
+  }
 }

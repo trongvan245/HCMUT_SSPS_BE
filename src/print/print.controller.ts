@@ -7,6 +7,7 @@ import { diskStorage } from "multer";
 import { v4 as uuidv4 } from "uuid";
 import { extname } from "path";
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
+import { updateAllowedFileTypesDto } from "./dto/print.dto";
 
 @ApiBearerAuth()
 @ApiTags("print")
@@ -49,9 +50,9 @@ export class PrintController {
     FileInterceptor("file", {
       limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
       fileFilter: (req, file, callback) => {
-        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|pdf)$/)) {
-          return callback(null, false);
-        }
+        // if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|pdf)$/)) {
+        //   return callback(null, false);
+        // }
         callback(null, true);
       },
       storage: diskStorage({
@@ -71,6 +72,10 @@ export class PrintController {
     @Body("copies") copies: number,
     @Body("pages") pages: number,
   ) {
+    const fileExtension = extname(file.originalname).toLowerCase().substring(1);
+    const allowfiletype = await this.printService.getAllowedFileTypes();
+    if (!allowfiletype.includes(fileExtension)) throw new NotFoundException("File type not allowed");
+
     if (!file) throw new NotFoundException("No file uploaded or file is not image");
     if (!id) throw new NotFoundException("ID is required");
     if (!(await this.printService.checkPrinterExist(id))) throw new NotFoundException("Printer not found");
@@ -85,5 +90,17 @@ export class PrintController {
     );
 
     return { message: "File uploaded successfully", record };
+  }
+
+  @Get("types")
+  async getAllowedFileTypes() {
+    const types = await this.printService.getAllowedFileTypes();
+    return { types };
+  }
+
+  @Post("updatetypes")
+  async updateAllowedFileTypes(@Body() { allowedFileTypes }: updateAllowedFileTypesDto) {
+    await this.printService.updateAllowedFileTypes(allowedFileTypes);
+    return { message: "Allowed file types updated successfully" };
   }
 }

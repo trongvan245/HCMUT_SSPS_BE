@@ -99,4 +99,24 @@ export class PrintService {
     const updatedPrinter = await this.updatePrinterTotalPages(id);
     return res;
   }
+
+  async getAllowedFileTypes(): Promise<string[]> {
+    const fileType = await this.prisma.allowedFileType.findFirst();
+    const types = (fileType?.types || []) as string[];
+    return types;
+  }
+
+  async updateAllowedFileTypes(types: string[]): Promise<void> {
+    const existing = await this.prisma.allowedFileType.findFirst();
+    if (existing) {
+      await this.prisma.allowedFileType.update({
+        where: { id: existing.id },
+        data: { types },
+      });
+    } else {
+      await this.prisma.allowedFileType.create({
+        data: { types },
+      });
+    }
+  }
 }
