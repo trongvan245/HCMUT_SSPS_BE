@@ -8,8 +8,23 @@ export class UserService {
   constructor(private prisma: PrismaService) {}
 
   async configPages(pages: number) {
-    const res = await this.prisma.user.updateMany({ data: { maxPages: pages } });
-    return res;
+    const users = await this.prisma.user.findMany();
+
+    // Update each user with the new pages configuration
+    const updatePromises = users.map(async (user) => {
+      const newRemainPages = pages - user.maxPages + user.remainPages;
+      const updateUser = await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          remainPages: newRemainPages,
+          maxPages: pages,
+        },
+      });
+      return { user: updateUser.name, remainPages: updateUser.remainPages, maxPages: updateUser.maxPages };
+    });
+
+    const updateUsers = await Promise.all(updatePromises);
+    return updateUsers;
   }
   async updateUserTotalPages(userId: string) {
     //very inefficient
@@ -101,7 +116,7 @@ export class UserService {
     const users = await this.prisma.user.findMany();
 
     const usersWithTotalRecords = await Promise.all(
-      users.map(async user => {
+      users.map(async (user) => {
         const numOfDocuments = await this.prisma.printingRecord.count({
           where: { userId: user.id },
         });
@@ -109,10 +124,9 @@ export class UserService {
           ...user,
           numOfDocuments,
         };
-      })
+      }),
     );
-    
-    
+
     return usersWithTotalRecords;
   }
 }
