@@ -28,6 +28,8 @@ model User {
   email    String @unique
   password String
 
+  mssv     String  @default("0000000")
+
   facultyName String @default("KHMT")
 
 

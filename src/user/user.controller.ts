@@ -57,6 +57,6 @@ export class UserController {
       delete user.password;
       return user;
     });
-    return { msg: "Get all users", filterUser };
+    return { msg: "Get all users", users: filterUser };
   }
 }

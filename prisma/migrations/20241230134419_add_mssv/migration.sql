@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "users" ADD COLUMN     "mssv" TEXT NOT NULL DEFAULT '0000000';

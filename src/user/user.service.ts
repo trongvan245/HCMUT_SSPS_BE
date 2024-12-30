@@ -28,11 +28,22 @@ export class UserService {
 
   async getMe(user: JwtPayLoad) {
     await this.updateUserTotalPages(user.sub);
-    return this.prisma.user.findUnique({
+    const records = await this.prisma.printingRecord.findMany({
+      where: {
+        userId: user.sub,
+      },
+    });
+
+    const getuser = await this.prisma.user.findUnique({
       where: {
         id: user.sub,
       },
     });
+    const numOfDocuments = records.length;
+    return {
+      ...getuser,
+      numOfDocuments,
+    };
   }
 
   async getHistory(user: JwtPayLoad) {
