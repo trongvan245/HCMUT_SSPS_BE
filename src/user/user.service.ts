@@ -98,6 +98,21 @@ export class UserService {
   }
 
   async getAllUsers() {
-    return this.prisma.user.findMany();
+    const users = await this.prisma.user.findMany();
+
+    const usersWithTotalRecords = await Promise.all(
+      users.map(async user => {
+        const numOfDocuments = await this.prisma.printingRecord.count({
+          where: { userId: user.id },
+        });
+        return {
+          ...user,
+          numOfDocuments,
+        };
+      })
+    );
+    
+    
+    return usersWithTotalRecords;
   }
 }
